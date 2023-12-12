@@ -30,7 +30,6 @@ class LhpResource extends Resource
     public static function form(Form $form): Form
     {
 
-
         $maxValuepkd = Lhp::where('kel_id', Auth::getUser()->kel_id)->max('no')+1;
         $kodepkd = Auth::getUser()->kel->kode;
         $namadesa = Auth::getUser()->kel->nama;
@@ -81,10 +80,12 @@ class LhpResource extends Resource
                                 ->required()
                                 ->selectablePlaceholder(false),
                             Forms\Components\Select::make('tahapan_id')
-                                ->relationship('tahapan', 'name'),
+                                ->relationship('tahapan', 'name')
+                                ->columnSpan(1),
                             Forms\Components\Select::make('spt_id')
                                 ->label('Surat Perintah Tugas')
-                                ->relationship('spt', 'nama'),
+                                ->relationship('spt', 'nama')
+                                ->columnSpan(2),
                             Forms\Components\TextInput::make('bentuk')
                                 ->required()
                                 ->maxLength(255),
@@ -108,34 +109,49 @@ class LhpResource extends Resource
                 Wizard\Step::make('Dugaan Pelanggaran')
                     ->schema([
                         Forms\Components\TextInput::make('peristiwa_pel')
+                            ->label('Peristiwa Pelanggaran')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('tem_kejadian_pel')
+                            ->label('Tempat Kejadian Pelanggaran')
                             ->maxLength(255),
                         Forms\Components\DatePicker::make('wak_kejadian_pel')
-                            ->format('d/m/Y'),
+                            ->label('Waktu Kejadian Pelanggaran')
+                            ->format('dd-mm-YYYY'),
                         Forms\Components\TextInput::make('pelaku_pel')
+                            ->label('Pelaku Pelanggaran')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('alamat_pel')
+                            ->label('Alamat Pelanggaran')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('nama_saksi_1')
+                            ->label('Nama Saksi 1')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('alamat_saksi_1')
+                            ->label('Alamat Saksi 1')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('nama_saksi_2')
+                            ->label('Nama Saksi 2')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('alamat_saksi_2')
+                            ->label('Alamat Saksi 2')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('alat_bukti_1')
+                            ->label('Alat Bukti 1')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('alat_bukti_2')
+                            ->label('Alat Bukti 2')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('alat_bukti_3')
+                            ->label('Alat Bukti 3')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('bb_1')
+                            ->label('Barang Bukti 1')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('bb_2')
+                            ->label('Barang Bukti 2')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('bb_3')
+                            ->label('Barang Bukti 3')
                             ->maxLength(255),
                         Forms\Components\Textarea::make('uraian_pel')
                             ->maxLength(65535)
@@ -282,14 +298,16 @@ class LhpResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('nomor')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('tahapan_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('tahapan.name')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('user_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('kel.name')
+                    ->label('Desa/Kelurahan')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('spt_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Petugas')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('spt.nama')
+                    ->label('Nomor SPT')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('bentuk')
                     ->searchable(),
@@ -298,63 +316,64 @@ class LhpResource extends Resource
                 Tables\Columns\TextColumn::make('sasaran')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('waktem')
+                    ->label('Waktu & Tempat Kejadian')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('peristiwa_pel')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('tem_kejadian_pel')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('wak_kejadian_pel')
-                    ->date()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('pelaku_pel')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('alamat_pel')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('nama_saksi_1')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('alamat_saksi_1')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('nama_saksi_2')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('alamat_saksi_2')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('alat_bukti_1')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('alat_bukti_2')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('alat_bukti_3')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('bb_1')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('bb_2')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('bb_3')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('peserta_pemilu_seng')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('tempat_seng')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('waktu_kejadian_seng')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('bentuk_seng')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('identitas_seng')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('hari_seng')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('kerugian_seng')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('tanggal_lap_seng')
-                    ->date()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('dok1')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('dok2')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('dok3')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('dok4')
-                    ->searchable(),
+                // Tables\Columns\TextColumn::make('peristiwa_pel')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('tem_kejadian_pel')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('wak_kejadian_pel')
+                //     ->date()
+                //     ->sortable(),
+                // Tables\Columns\TextColumn::make('pelaku_pel')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('alamat_pel')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('nama_saksi_1')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('alamat_saksi_1')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('nama_saksi_2')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('alamat_saksi_2')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('alat_bukti_1')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('alat_bukti_2')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('alat_bukti_3')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('bb_1')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('bb_2')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('bb_3')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('peserta_pemilu_seng')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('tempat_seng')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('waktu_kejadian_seng')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('bentuk_seng')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('identitas_seng')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('hari_seng')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('kerugian_seng')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('tanggal_lap_seng')
+                    // ->date()
+                    // ->sortable(),
+                Tables\Columns\ImageColumn::make('dok1')
+                    ->label('Dokumentasi 1'),
+                Tables\Columns\ImageColumn::make('dok2')
+                    ->label('Dokumentasi 2'),
+                Tables\Columns\ImageColumn::make('dok3')
+                    ->label('Dokumentasi 3'),
+                Tables\Columns\ImageColumn::make('dok4')
+                    ->label('Dokumentasi 4'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

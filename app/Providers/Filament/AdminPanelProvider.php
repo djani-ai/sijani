@@ -35,7 +35,7 @@ class AdminPanelProvider extends PanelProvider
                 'Data',
                 'Master Data'
             ])
-            ->sidebarFullyCollapsibleOnDesktop()
+            ->sidebarCollapsibleOnDesktop()
             ->font('Poppins')
             ->brandName('SIJANI')
             // ->brandLogo(asset('images/logo.svg'))
