@@ -80,12 +80,12 @@ class LhpResource extends Resource
                                 ->required()
                                 ->selectablePlaceholder(false),
                             Forms\Components\Select::make('tahapan_id')
-                                ->relationship('tahapan', 'name')
-                                ->columnSpan(1),
+                                ->relationship('tahapan', 'name'),
+                                // ->columnSpan(1),
                             Forms\Components\Select::make('spt_id')
                                 ->label('Surat Perintah Tugas')
-                                ->relationship('spt', 'nama')
-                                ->columnSpan(2),
+                                ->relationship('spt', 'nama'),
+                                // ->columnSpan(2),
                             Forms\Components\TextInput::make('bentuk')
                                 ->required()
                                 ->maxLength(255),
@@ -98,13 +98,13 @@ class LhpResource extends Resource
                             Forms\Components\TextInput::make('waktem')
                                 ->label('Waktu dan Tempat')
                                 ->required()
-                                ->maxLength(255)
-                                ->columnSpanFull(),
+                                ->maxLength(255),
+                                // ->columnSpanFull(),
                             Forms\Components\RichEditor::make('uraian')
                                 ->required()
                                 ->maxLength(65535)
                                 ->columnSpanFull(),
-                        ])->columns(3),
+                        ])
                 ]),
                 Wizard\Step::make('Dugaan Pelanggaran')
                     ->schema([
@@ -162,7 +162,7 @@ class LhpResource extends Resource
                         Forms\Components\Textarea::make('analisa_pel')
                             ->maxLength(65535)
                             ->columnSpanFull(),
-                    ])->columns(3),
+                    ])->columns(2),
                 Wizard\Step::make('Informasi Sengketa')
                     ->schema([
                         Forms\Components\TextInput::make('tempat_seng')
@@ -434,11 +434,11 @@ class LhpResource extends Resource
                         $templateProcessor->setValue('uraian_seng', $lhp->uraian_seng);
                         $templateProcessor->setValue('tanggal_lap_seng', $lhp->tanggal_lap_seng);
                         // $templateProcessor->setImageValue('ttd', 'storage/'.$lhp->ttd);
-                        if (!empty($lhp->dok1)) {
-                            $templateProcessor->setImageValue('ttd', 'storage/'.$lhp->user->ttd);
-                        } else {
+                        // if (!empty($lhp->dok1)) {
+                        //     $templateProcessor->setImageValue('ttd', 'storage/'.$lhp->user->ttd);
+                        // } else {
                             $templateProcessor->setImageValue('ttd', 'storage/kosong.png');
-                        }
+                        // }
                         //Proses Dokumentasi
                         if (!empty($lhp->dok1)) {
                             $templateProcessor->setImageValue('dok1', 'storage/'.$lhp->dok1);
