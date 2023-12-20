@@ -9,6 +9,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -48,13 +49,9 @@ class UserResource extends Resource
                 Forms\Components\Select::make('kel_id')
                     ->label('Desa/Kelurahan')
                     ->relationship('kel', 'name'),
-                    // ->numeric(),
                 Forms\Components\Select::make('roles')
                     ->label('Jabatan')
-                    ->relationship('roles', 'name')
-                    ->multiple()
-                    ->preload()
-                    ->searchable(),
+                    ->relationship('roles', 'name'),
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->required()
@@ -70,7 +67,7 @@ class UserResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
-                Tables\Columns\ImageColumn::make('image'),
+                Tables\Columns\ImageColumn::make('foto'),
                 Tables\Columns\ImageColumn::make('ttd'),
                 Tables\Columns\TextColumn::make('alamat')
                     ->searchable(),
@@ -100,9 +97,12 @@ class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('user')
+                ->relationship('kel', 'name')
+                ->indicator('user','kel_id')
             ])
             ->actions([
+                Tables\Actions\ReplicateAction::make(),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
@@ -129,6 +129,5 @@ class UserResource extends Resource
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
-
 
 }

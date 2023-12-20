@@ -18,6 +18,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'alamat',
+        'kec_id',
+        'kel_id',
     ];
 
     protected $hidden = [
@@ -30,10 +33,7 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    // public function jabatan(): BelongsTo
-    // {
-    //     return $this->belongsTo(jabatan::class, 'jabatan_id');
-    // }
+
     public function kel(): BelongsTo
     {
         return $this->belongsTo(Kel::class, 'kel_id');
@@ -42,4 +42,5 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Kec::class, 'kec_id');
     }
+
 }

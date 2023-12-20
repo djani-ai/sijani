@@ -30,6 +30,8 @@ class LhpResource extends Resource
     public static function form(Form $form): Form
     {
 
+        $role = Auth::getUser()->role->name;
+        dd($role);
         $maxValuepkd = Lhp::where('kel_id', Auth::getUser()->kel_id)->max('no')+1;
         $kodepkd = Auth::getUser()->kel->kode;
         $namadesa = Auth::getUser()->kel->nama;
