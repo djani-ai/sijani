@@ -21,6 +21,8 @@ class User extends Authenticatable
         'alamat',
         'kec_id',
         'kel_id',
+        'image',
+        'ttd',
     ];
 
     protected $hidden = [

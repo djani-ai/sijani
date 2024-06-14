@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Query\Builder;
 use Spatie\Permission\Traits\HasRoles;
 
 class Lhp extends Model
@@ -31,4 +33,11 @@ class Lhp extends Model
     {
         return $this->belongsTo(Spt::class, 'spt_id');
     }
+
+    public static function query(): EloquentBuilder
+    {
+        // Batasi query hanya untuk pengguna yang sedang login
+        return parent::query()->where('user_id', auth()->id());
+    }
+
 }

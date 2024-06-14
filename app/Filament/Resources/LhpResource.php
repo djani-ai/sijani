@@ -24,13 +24,11 @@ class LhpResource extends Resource
     protected static ?string $navigationGroup = 'Form A';
     protected static ?string $navigationLabel = 'Form A LHP';
     protected static ?string $label = 'Form A';
-
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
 
-        // $role = Auth::getUser()->role->name;
         $maxValuepkd = Lhp::where('kel_id', Auth::getUser()->kel_id)->max('no')+1;
         $kodepkd = Auth::getUser()->kel->kode;
         $namadesa = Auth::getUser()->kel->nama;
@@ -83,12 +81,10 @@ class LhpResource extends Resource
                             Forms\Components\Select::make('tahapan_id')
                                 ->required()
                                 ->relationship('tahapan', 'name'),
-                                // ->columnSpan(1),
                             Forms\Components\Select::make('spt_id')
                                 ->label('Surat Perintah Tugas')
                                 ->required()
                                 ->relationship('spt', 'nama'),
-                                // ->columnSpan(2),
                             Forms\Components\TextInput::make('bentuk')
                                 ->required()
                                 ->maxLength(255),
@@ -102,7 +98,6 @@ class LhpResource extends Resource
                                 ->label('Waktu dan Tempat')
                                 ->required()
                                 ->maxLength(255),
-                                // ->columnSpanFull(),
                             Forms\Components\RichEditor::make('uraian')
                                 ->required()
                                 ->maxLength(65535)
@@ -188,109 +183,19 @@ class LhpResource extends Resource
                     ])->columns(3),
                 Wizard\Step::make('Dokumentasi')
                     ->schema([
-                        Forms\Components\FileUpload::make('dok1'),
-                        Forms\Components\FileUpload::make('dok2'),
-                        Forms\Components\FileUpload::make('dok3'),
+                        Forms\Components\FileUpload::make('dok1')
+                        ->optimize('jpg'),
+                        Forms\Components\FileUpload::make('dok2')
+                        ->optimize('jpg'),
+                        Forms\Components\FileUpload::make('dok3')
+                        ->optimize('jpg'),
                         Forms\Components\FileUpload::make('dok4')
+                        ->optimize('jpg')
                     ])->columns(2),
             ])->columnSpanFull()
         ]);
-
-            // ->schema([
-            //     Forms\Components\TextInput::make('no')
-            //         ->numeric(),
-            //     Forms\Components\TextInput::make('nomor')
-            //         ->required()
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('tahapan_id')
-            //         ->numeric(),
-            //     Forms\Components\TextInput::make('user_id')
-            //         ->numeric(),
-            //     Forms\Components\TextInput::make('spt_id')
-            //         ->numeric(),
-            //     Forms\Components\TextInput::make('bentuk')
-            //         ->required()
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('tujuan')
-            //         ->required()
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('sasaran')
-            //         ->required()
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('waktem')
-            //         ->required()
-            //         ->maxLength(255),
-            //     Forms\Components\Textarea::make('uraian')
-            //         ->required()
-            //         ->maxLength(65535)
-            //         ->columnSpanFull(),
-            //     Forms\Components\TextInput::make('peristiwa_pel')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('tem_kejadian_pel')
-            //         ->maxLength(255),
-            //     Forms\Components\DatePicker::make('wak_kejadian_pel'),
-            //     Forms\Components\TextInput::make('pelaku_pel')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('alamat_pel')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('nama_saksi_1')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('alamat_saksi_1')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('nama_saksi_2')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('alamat_saksi_2')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('alat_bukti_1')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('alat_bukti_2')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('alat_bukti_3')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('bb_1')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('bb_2')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('bb_3')
-            //         ->maxLength(255),
-            //     Forms\Components\Textarea::make('uraian_pel')
-            //         ->maxLength(65535)
-            //         ->columnSpanFull(),
-            //     Forms\Components\Textarea::make('fakta_pel')
-            //         ->maxLength(65535)
-            //         ->columnSpanFull(),
-            //     Forms\Components\Textarea::make('analisa_pel')
-            //         ->maxLength(65535)
-            //         ->columnSpanFull(),
-            //     Forms\Components\TextInput::make('peserta_pemilu_seng')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('tempat_seng')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('waktu_kejadian_seng')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('bentuk_seng')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('identitas_seng')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('hari_seng')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('kerugian_seng')
-            //         ->maxLength(255),
-            //     Forms\Components\Textarea::make('uraian_seng')
-            //         ->maxLength(65535)
-            //         ->columnSpanFull(),
-            //     Forms\Components\DatePicker::make('tanggal_lap_seng')
-            //         ->required(),
-            //     Forms\Components\TextInput::make('dok1')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('dok2')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('dok3')
-            //         ->maxLength(255),
-            //     Forms\Components\TextInput::make('dok4')
-            //         ->maxLength(255),
-            // ]);
     }
+
 
     public static function table(Table $table): Table
     {
@@ -321,54 +226,6 @@ class LhpResource extends Resource
                 Tables\Columns\TextColumn::make('waktem')
                     ->label('Waktu & Tempat Kejadian')
                     ->searchable(),
-                // Tables\Columns\TextColumn::make('peristiwa_pel')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('tem_kejadian_pel')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('wak_kejadian_pel')
-                //     ->date()
-                //     ->sortable(),
-                // Tables\Columns\TextColumn::make('pelaku_pel')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('alamat_pel')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('nama_saksi_1')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('alamat_saksi_1')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('nama_saksi_2')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('alamat_saksi_2')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('alat_bukti_1')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('alat_bukti_2')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('alat_bukti_3')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('bb_1')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('bb_2')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('bb_3')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('peserta_pemilu_seng')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('tempat_seng')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('waktu_kejadian_seng')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('bentuk_seng')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('identitas_seng')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('hari_seng')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('kerugian_seng')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('tanggal_lap_seng')
-                    // ->date()
-                    // ->sortable(),
                 Tables\Columns\ImageColumn::make('dok1')
                     ->label('Dokumentasi 1'),
                 Tables\Columns\ImageColumn::make('dok2')
@@ -455,32 +312,31 @@ class LhpResource extends Resource
                         $templateProcessor->setValue('tanggal_lap_seng', $tanggalDalamBahasaIndonesia);
                         $templateProcessor->setImageValue('ttd', 'storage/'.$lhp->user->ttd);
                         //Proses Dokumentasi
-                        if (!empty($lhp->dok1)) {
+                        if (($lhp->dok1)) {
                             $templateProcessor->setImageValue('dok1', 'storage/'.$lhp->dok1);
                         } else {
-                            $templateProcessor->setImageValue('dok1', 'storage/kosong.png');
+                            $templateProcessor->setValue('dok1', '');
                         }
-                        if (!empty($lhp->dok2)) {
+                        if (($lhp->dok2)) {
                             $templateProcessor->setImageValue('dok2', 'storage/'.$lhp->dok2);
                         } else {
-                            $templateProcessor->setImageValue('dok2', 'storage/kosong.png');
+                            $templateProcessor->setValue('dok2', '');
                         }
-                        if (!empty($lhp->dok3)) {
+                        if (($lhp->dok3)) {
                             $templateProcessor->setImageValue('dok3', 'storage/'.$lhp->dok3);
                         } else {
-                            $templateProcessor->setImageValue('dok3', 'storage/kosong.png');
+                            $templateProcessor->setValue('dok3', '');
                         }
-                        if (!empty($lhp->dok4)) {
+                        if (($lhp->dok4)) {
                             $templateProcessor->setImageValue('dok4', 'storage/'.$lhp->dok4);
                         } else {
-                            $templateProcessor->setImageValue('dok4', 'storage/kosong.png');
+                            $templateProcessor->setValue('dok4', '');
                         }
-                        $fileNameAwal = $lhp->nomor;
-                        $fileName= str_replace("/", "-", $fileNameAwal);
+                        $fileName= str_replace("/", "-", $lhp->nomor);
                         $templateProcessor->saveAs($fileName . '.docx');
                         return response()
                             ->download($fileName . '.docx')
-                            ->deleteFileAfterSend(false);
+                            ->deleteFileAfterSend(true);
                     }),
             ])
             ->bulkActions([

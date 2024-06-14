@@ -13,6 +13,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\FileUpload;
 
 class UserResource extends Resource
 {
@@ -36,10 +37,11 @@ class UserResource extends Resource
                     ->maxLength(255),
                 Forms\Components\FileUpload::make('image')
                     ->label('Foto')
+                    ->imageEditor()
                     ->image(),
-                Forms\Components\FileUpload::make('ttd')
-                    ->label('Tanda Tangan')
-                    ->image(),
+                FileUpload::make('ttd')
+                    ->image()
+                    ->imageEditor(),
                 Forms\Components\TextInput::make('alamat')
                     ->maxLength(255),
                 Forms\Components\Select::make('kec_id')
