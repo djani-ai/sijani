@@ -40,7 +40,8 @@ class AdminPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop()
             ->font('Poppins')
             ->brandName('SiwasBro')
-            // ->brandLogo(asset('images/logo.svg'))
+            ->brandLogo(asset('storage/siwasbro.png'))
+            ->brandLogoHeight('4rem')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
