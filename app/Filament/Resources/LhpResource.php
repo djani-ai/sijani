@@ -266,6 +266,7 @@ class LhpResource extends Resource
                         $templateProcessor->setValue('sasaran', $lhp->sasaran);
                         $templateProcessor->setValue('waktem', $lhp->waktem);
                         $templateProcessor->setValue('uraian', strip_tags($lhp->uraian));
+                        // if (($lhp->peristiwa_pel)) {
                         $templateProcessor->setValue('peristiwa_pel', $lhp->peristiwa_pel);
                         $templateProcessor->setValue('tem_kejadian_pel', $lhp->tem_kejadian_pel);
                         $templateProcessor->setValue('wak_kejadian_pel', $lhp->wak_kejadian_pel);
@@ -284,6 +285,11 @@ class LhpResource extends Resource
                         $templateProcessor->setValue('uraian_pel', $lhp->uraian_pel);
                         $templateProcessor->setValue('fakta_pel', $lhp->fakta_pel);
                         $templateProcessor->setValue('analisa_pel', $lhp->analisa_pel);
+                        // } else {
+                            // $templateProcessor->replaceBlock('$block_name', 'This is the replacement text.');
+                        // }
+
+
                         $templateProcessor->setValue('peserta_pemilu_seng', $lhp->peserta_pemilu_seng);
                         $templateProcessor->setValue('tempat_seng', $lhp->tempat_seng);
                         $templateProcessor->setValue('waktu_kejadian_seng', $lhp->waktu_kejadian_seng);
