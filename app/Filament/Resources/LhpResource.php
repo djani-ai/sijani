@@ -30,12 +30,11 @@ class LhpResource extends Resource
     public static function form(Form $form): Form
     {
 
-        $role = Auth::getUser()->role->name;
-        dd($role);
+        // $role = Auth::getUser()->role->name;
         $maxValuepkd = Lhp::where('kel_id', Auth::getUser()->kel_id)->max('no')+1;
         $kodepkd = Auth::getUser()->kel->kode;
         $namadesa = Auth::getUser()->kel->nama;
-        $noreg = str_pad($maxValuepkd, 3, '0', STR_PAD_LEFT) . '/LHP/PM.01.02/JI.04.01.' . $kodepkd . '/' . date('d-m-Y') ;
+        $noreg = str_pad($maxValuepkd, 3, '0', STR_PAD_LEFT) . '/LHP/PM.01.02/JI-11.07.' . $kodepkd . '/' . date('d/m/Y') ;
 
         return $form
         ->schema([
@@ -82,10 +81,12 @@ class LhpResource extends Resource
                                 ->required()
                                 ->selectablePlaceholder(false),
                             Forms\Components\Select::make('tahapan_id')
+                                ->required()
                                 ->relationship('tahapan', 'name'),
                                 // ->columnSpan(1),
                             Forms\Components\Select::make('spt_id')
                                 ->label('Surat Perintah Tugas')
+                                ->required()
                                 ->relationship('spt', 'nama'),
                                 // ->columnSpan(2),
                             Forms\Components\TextInput::make('bentuk')
@@ -434,13 +435,25 @@ class LhpResource extends Resource
                         $templateProcessor->setValue('hari_seng', $lhp->hari_seng);
                         $templateProcessor->setValue('kerugian_seng', $lhp->kerugian_seng);
                         $templateProcessor->setValue('uraian_seng', $lhp->uraian_seng);
-                        $templateProcessor->setValue('tanggal_lap_seng', $lhp->tanggal_lap_seng);
-                        // $templateProcessor->setImageValue('ttd', 'storage/'.$lhp->ttd);
-                        // if (!empty($lhp->dok1)) {
-                        //     $templateProcessor->setImageValue('ttd', 'storage/'.$lhp->user->ttd);
-                        // } else {
-                            $templateProcessor->setImageValue('ttd', 'storage/kosong.png');
-                        // }
+                        $bulanIndonesia = [
+                            "01" => "Januari",
+                            "02" => "Februari",
+                            "03" => "Maret",
+                            "04" => "April",
+                            "05" => "Mei",
+                            "06" => "Juni",
+                            "07" => "Juli",
+                            "08" => "Agustus",
+                            "09" => "September",
+                            "10" => "Oktober",
+                            "11" => "November",
+                            "12" => "Desember"
+                        ];
+                        list($tahun, $bulan, $tanggal) = explode("-", $lhp->tanggal_lap_seng);
+                        $namaBulan = $bulanIndonesia[$bulan];
+                        $tanggalDalamBahasaIndonesia = "$tanggal $namaBulan $tahun";
+                        $templateProcessor->setValue('tanggal_lap_seng', $tanggalDalamBahasaIndonesia);
+                        $templateProcessor->setImageValue('ttd', 'storage/'.$lhp->user->ttd);
                         //Proses Dokumentasi
                         if (!empty($lhp->dok1)) {
                             $templateProcessor->setImageValue('dok1', 'storage/'.$lhp->dok1);
@@ -462,11 +475,8 @@ class LhpResource extends Resource
                         } else {
                             $templateProcessor->setImageValue('dok4', 'storage/kosong.png');
                         }
-                        // $templateProcessor->setImageValue('dok1', 'storage/'.$lhp->dok1, null);
-                        // $templateProcessor->setImageValue('dok2', 'storage/'.$lhp->dok2, null);
-                        // $templateProcessor->setImageValue('dok3', 'storage/'.$lhp->dok3, null);
-                        // $templateProcessor->setImageValue('dok4', 'storage/'.$lhp->dok4, null);
-                        $fileName = $lhp->no .' FORM-A '.$lhp->user->kel->name. $lhp->tahapan->name;
+                        $fileNameAwal = $lhp->nomor;
+                        $fileName= str_replace("/", "-", $fileNameAwal);
                         $templateProcessor->saveAs($fileName . '.docx');
                         return response()
                             ->download($fileName . '.docx')
