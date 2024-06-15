@@ -265,7 +265,7 @@ class LhpResource extends Resource
                         $templateProcessor->setValue('tujuan', $lhp->tujuan);
                         $templateProcessor->setValue('sasaran', $lhp->sasaran);
                         $templateProcessor->setValue('waktem', $lhp->waktem);
-                        $templateProcessor->setValue('uraian', htmlspecialchars($lhp->uraian));
+                        $templateProcessor->setValue('uraian', htmlspecialchars($lhp->uraian, ENT_QUOTES, 'UTF-8'));
                         // if (($lhp->peristiwa_pel)) {
                         $templateProcessor->setValue('peristiwa_pel', $lhp->peristiwa_pel);
                         $templateProcessor->setValue('tem_kejadian_pel', $lhp->tem_kejadian_pel);
