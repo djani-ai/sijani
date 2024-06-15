@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpWord\TemplateProcessor;
+use PhpOffice\PhpWord\Shared\Html;
 
 class LhpResource extends Resource
 {
@@ -24,7 +25,7 @@ class LhpResource extends Resource
     protected static ?string $navigationGroup = 'Form A';
     protected static ?string $navigationLabel = 'Form A LHP';
     protected static ?string $label = 'Form A';
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-document-magnifying-glass';
 
     public static function form(Form $form): Form
     {
@@ -38,6 +39,7 @@ class LhpResource extends Resource
         ->schema([
             Wizard::make([
                 Wizard\Step::make('Uraian Pengawasan')
+                    ->icon('heroicon-m-document-magnifying-glass')
                     ->schema([
                         Fieldset::make('Nomor Registrasi')
                         ->schema([
@@ -48,7 +50,7 @@ class LhpResource extends Resource
                                 ->default($noreg)
                                 ->required()
                                 ->maxLength(255),
-                        ]),
+                                ]),
                         Fieldset::make('Uraian')
                         ->schema([
                             Forms\Components\Select::make('user_id')
@@ -98,13 +100,18 @@ class LhpResource extends Resource
                                 ->label('Waktu dan Tempat')
                                 ->required()
                                 ->maxLength(255),
-                            Forms\Components\RichEditor::make('uraian')
+                            Forms\Components\DatePicker::make('tanggal_lap_seng')
+                                ->label('Tanggal Pengawasan/Pelaporan')
+                                ->required(),
+                            Forms\Components\Textarea::make('uraian')
                                 ->required()
                                 ->maxLength(65535)
+                                ->rows('8')
                                 ->columnSpanFull(),
-                        ])
-                ]),
+                                ])
+                            ]),
                 Wizard\Step::make('Dugaan Pelanggaran')
+                    ->icon('heroicon-m-bug-ant')
                     ->schema([
                         Forms\Components\TextInput::make('peristiwa_pel')
                             ->label('Peristiwa Pelanggaran')
@@ -160,8 +167,10 @@ class LhpResource extends Resource
                         Forms\Components\Textarea::make('analisa_pel')
                             ->maxLength(65535)
                             ->columnSpanFull(),
-                    ])->columns(2),
+                    ])
+                    ->columns(2),
                 Wizard\Step::make('Informasi Sengketa')
+                    ->icon('heroicon-m-hand-raised')
                     ->schema([
                         Forms\Components\TextInput::make('tempat_seng')
                             ->maxLength(255),
@@ -178,21 +187,30 @@ class LhpResource extends Resource
                         Forms\Components\Textarea::make('uraian_seng')
                             ->maxLength(65535)
                             ->columnSpanFull(),
-                        Forms\Components\DatePicker::make('tanggal_lap_seng')
-                            ->required(),
                     ])->columns(3),
                 Wizard\Step::make('Dokumentasi')
+                    ->icon('heroicon-m-camera')
                     ->schema([
                         Forms\Components\FileUpload::make('dok1')
+                        ->label('Dokumentasi 1')
+                        ->imageResizeTargetWidth('512')
                         ->optimize('jpg'),
                         Forms\Components\FileUpload::make('dok2')
+                        ->label('Dokumentasi 2')
+                        ->imageResizeTargetWidth('512')
                         ->optimize('jpg'),
                         Forms\Components\FileUpload::make('dok3')
+                        ->label('Dokumentasi 3')
+                        ->imageResizeTargetWidth('512')
                         ->optimize('jpg'),
                         Forms\Components\FileUpload::make('dok4')
-                        ->optimize('jpg')
+                        ->label('Dokumentasi 4')
+                        ->imageResizeTargetWidth('512')
+                        ->optimize('jpg'),
+
                     ])->columns(2),
             ])->columnSpanFull()
+            ->skippable()
         ]);
     }
 
@@ -251,7 +269,7 @@ class LhpResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 // EXPORT
-                Tables\Actions\Action::make('Cetak')
+                Tables\Actions\Action::make('Word')
                     ->icon('heroicon-o-printer')
                     ->action(function (Lhp $lhp, array $data) {
                         $templateProcessor = new TemplateProcessor('word-template/lhp.docx');
@@ -265,8 +283,7 @@ class LhpResource extends Resource
                         $templateProcessor->setValue('tujuan', $lhp->tujuan);
                         $templateProcessor->setValue('sasaran', $lhp->sasaran);
                         $templateProcessor->setValue('waktem', $lhp->waktem);
-                        $templateProcessor->setValue('uraian', htmlspecialchars($lhp->uraian, ENT_QUOTES, 'UTF-8'));
-                        // if (($lhp->peristiwa_pel)) {
+                        $templateProcessor->setValue('uraian', $lhp->uraian);
                         $templateProcessor->setValue('peristiwa_pel', $lhp->peristiwa_pel);
                         $templateProcessor->setValue('tem_kejadian_pel', $lhp->tem_kejadian_pel);
                         $templateProcessor->setValue('wak_kejadian_pel', $lhp->wak_kejadian_pel);
@@ -285,11 +302,6 @@ class LhpResource extends Resource
                         $templateProcessor->setValue('uraian_pel', $lhp->uraian_pel);
                         $templateProcessor->setValue('fakta_pel', $lhp->fakta_pel);
                         $templateProcessor->setValue('analisa_pel', $lhp->analisa_pel);
-                        // } else {
-                            // $templateProcessor->replaceBlock('$block_name', 'This is the replacement text.');
-                        // }
-
-
                         $templateProcessor->setValue('peserta_pemilu_seng', $lhp->peserta_pemilu_seng);
                         $templateProcessor->setValue('tempat_seng', $lhp->tempat_seng);
                         $templateProcessor->setValue('waktu_kejadian_seng', $lhp->waktu_kejadian_seng);
