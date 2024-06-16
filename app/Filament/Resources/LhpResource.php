@@ -3,9 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\LhpResource\Pages;
-use App\Filament\Resources\LhpResource\RelationManagers;
 use App\Models\Lhp;
-use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Wizard;
@@ -13,11 +11,9 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpWord\TemplateProcessor;
-use PhpOffice\PhpWord\Shared\Html;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class LhpResource extends Resource
 {
@@ -29,12 +25,10 @@ class LhpResource extends Resource
 
     public static function form(Form $form): Form
     {
-
         $maxValuepkd = Lhp::where('kel_id', Auth::getUser()->kel_id)->max('no')+1;
         $kodepkd = Auth::getUser()->kel->kode;
         $namadesa = Auth::getUser()->kel->nama;
         $noreg = str_pad($maxValuepkd, 3, '0', STR_PAD_LEFT) . '/LHP/PM.01.02/JI-11.07.' . $kodepkd . '/' . date('d/m/Y') ;
-
         return $form
         ->schema([
             Wizard::make([
@@ -244,6 +238,9 @@ class LhpResource extends Resource
                 Tables\Columns\TextColumn::make('waktem')
                     ->label('Waktu & Tempat Kejadian')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('uraian')
+                    ->label('Uraian Kejadian')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\ImageColumn::make('dok1')
                     ->label('Dokumentasi 1'),
                 Tables\Columns\ImageColumn::make('dok2')
@@ -262,8 +259,14 @@ class LhpResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
             ])
+            // ->headerActions([
+            //     ExportAction::make()->exports([
+            //         ExcelExport::make('table')->fromTable(),
+            //         ExcelExport::make('form')->fromForm(),
+            //         ExcelExport::make('Model')->fromModel()
+            //     ]),
+            // ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
@@ -351,14 +354,16 @@ class LhpResource extends Resource
                             $templateProcessor->setValue('dok4', '');
                         }
                         $fileName= str_replace("/", "-", $lhp->nomor);
-                        $templateProcessor->saveAs($fileName . '.docx');
+                        $templateProcessor->saveAs('DATA-FORM-A/'.$fileName . '.docx');
                         return response()
-                            ->download($fileName . '.docx')
-                            ->deleteFileAfterSend(true);
+                            ->download('DATA-FORM-A/'.$fileName . '.docx')
+                            ->deleteFileAfterSend(false);
                     }),
-            ])
+                // Save to Drive
+                ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    ExportBulkAction::make(),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
