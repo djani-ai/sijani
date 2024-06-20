@@ -8,27 +8,32 @@ use Filament\Forms;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Wizard;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpWord\TemplateProcessor;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use Yaza\LaravelGoogleDriveStorage\Gdrive;
 
 class LhpResource extends Resource
 {
     protected static ?string $model = Lhp::class;
     protected static ?string $navigationGroup = 'Form A';
     protected static ?string $navigationLabel = 'Form A LHP';
-    protected static ?string $label = 'Form A';
+    protected static ?string $pluralModelLabel = 'Form A';
     protected static ?string $navigationIcon = 'heroicon-o-document-magnifying-glass';
 
     public static function form(Form $form): Form
     {
+        // $role = Auth::getUser()->roles->pluck('id');
+        // dd($role);
         $maxValuepkd = Lhp::where('kel_id', Auth::getUser()->kel_id)->max('no')+1;
         $kodepkd = Auth::getUser()->kel->kode;
-        $namadesa = Auth::getUser()->kel->nama;
-        $noreg = str_pad($maxValuepkd, 3, '0', STR_PAD_LEFT) . '/LHP/PM.01.02/JI-11.07.' . $kodepkd . '/' . date('d/m/Y') ;
+        $noreg = '/LHP/PM.01.02/JI-11.07.' . $kodepkd . '/' . date('d/m/Y') ;
         return $form
         ->schema([
             Wizard::make([
@@ -38,10 +43,16 @@ class LhpResource extends Resource
                         Fieldset::make('Nomor Registrasi')
                         ->schema([
                             Forms\Components\TextInput::make('no')
+                                ->label('No Urut')
                                 ->default($maxValuepkd)
+                                ->live()
+                                ->afterStateUpdated(fn (Set $set, ?int $state) => $set('nomor', str_pad($state, 3, '0', STR_PAD_LEFT) . $noreg))
                                 ->numeric(),
+                                // ->unique(),
                             Forms\Components\TextInput::make('nomor')
-                                ->default($noreg)
+                                ->label('Nomor Surat Form A')
+                                ->default(fn (Get $get) => (str_pad($get('no'), 3, '0', STR_PAD_LEFT) . $noreg))
+                                // ->unique()
                                 ->required()
                                 ->maxLength(255),
                                 ]),
@@ -61,7 +72,7 @@ class LhpResource extends Resource
                                 ->label('Kecamatan')
                                 ->options([
                                     Auth::getUser()->kec->id => Auth::getUser()->kec->name,
-                                ])
+                                    ])
                                 ->default(Auth::getUser()->kec->id)
                                 ->required()
                                 ->selectablePlaceholder(false),
@@ -208,7 +219,6 @@ class LhpResource extends Resource
         ]);
     }
 
-
     public static function table(Table $table): Table
     {
         return $table
@@ -257,16 +267,17 @@ class LhpResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-            ])
+                ])
             ->filters([
-            ])
-            // ->headerActions([
-            //     ExportAction::make()->exports([
-            //         ExcelExport::make('table')->fromTable(),
-            //         ExcelExport::make('form')->fromForm(),
-            //         ExcelExport::make('Model')->fromModel()
-            //     ]),
-            // ])
+                ])
+            // Header di dalam Table
+                // ->headerActions([
+                //     ExportAction::make()->exports([
+                //         ExcelExport::make('table')->fromTable(),
+                //         ExcelExport::make('form')->fromForm(),
+                //         ExcelExport::make('Model')->fromModel()
+                //     ]),
+                // ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
@@ -275,91 +286,107 @@ class LhpResource extends Resource
                 Tables\Actions\Action::make('Word')
                     ->icon('heroicon-o-printer')
                     ->action(function (Lhp $lhp, array $data) {
-                        $templateProcessor = new TemplateProcessor('word-template/lhp.docx');
-                        $templateProcessor->setValue('noreg', $lhp->nomor);
-                        $templateProcessor->setValue('tahapan', $lhp->tahapan->name);
-                        $templateProcessor->setValue('namapkd', $lhp->user->name);
-                        $templateProcessor->setValue('jabatan', 'PKD' .' '. $lhp->user->kel->name);
-                        $templateProcessor->setValue('nospt', $lhp->spt->kode);
-                        $templateProcessor->setValue('alamat', $lhp->user->alamat);
-                        $templateProcessor->setValue('bentuk', $lhp->bentuk);
-                        $templateProcessor->setValue('tujuan', $lhp->tujuan);
-                        $templateProcessor->setValue('sasaran', $lhp->sasaran);
-                        $templateProcessor->setValue('waktem', $lhp->waktem);
-                        $templateProcessor->setValue('uraian', $lhp->uraian);
-                        $templateProcessor->setValue('peristiwa_pel', $lhp->peristiwa_pel);
-                        $templateProcessor->setValue('tem_kejadian_pel', $lhp->tem_kejadian_pel);
-                        $templateProcessor->setValue('wak_kejadian_pel', $lhp->wak_kejadian_pel);
-                        $templateProcessor->setValue('pelaku_pel', $lhp->pelaku_pel);
-                        $templateProcessor->setValue('alamat_pel', $lhp->alamat_pel);
-                        $templateProcessor->setValue('nama_saksi_1', $lhp->nama_saksi_1);
-                        $templateProcessor->setValue('alamat_saksi', $lhp->alamat_saksi_1);
-                        $templateProcessor->setValue('nama_saksi_2', $lhp->nama_saksi_2);
-                        $templateProcessor->setValue('alamat_saksi_2', $lhp->alamat_saksi_2);
-                        $templateProcessor->setValue('alat_bukti_1', $lhp->alat_bukti_1);
-                        $templateProcessor->setValue('alat_bukti_2', $lhp->alat_bukti_2);
-                        $templateProcessor->setValue('alat_bukti_3', $lhp->alat_bukti_3);
-                        $templateProcessor->setValue('bb_1', $lhp->bb_1);
-                        $templateProcessor->setValue('bb_2', $lhp->bb_2);
-                        $templateProcessor->setValue('bb_3', $lhp->bb_3);
-                        $templateProcessor->setValue('uraian_pel', $lhp->uraian_pel);
-                        $templateProcessor->setValue('fakta_pel', $lhp->fakta_pel);
-                        $templateProcessor->setValue('analisa_pel', $lhp->analisa_pel);
-                        $templateProcessor->setValue('peserta_pemilu_seng', $lhp->peserta_pemilu_seng);
-                        $templateProcessor->setValue('tempat_seng', $lhp->tempat_seng);
-                        $templateProcessor->setValue('waktu_kejadian_seng', $lhp->waktu_kejadian_seng);
-                        $templateProcessor->setValue('bentuk_seng', $lhp->bentuk_seng);
-                        $templateProcessor->setValue('identitas_seng', $lhp->identitas_seng);
-                        $templateProcessor->setValue('hari_seng', $lhp->hari_seng);
-                        $templateProcessor->setValue('kerugian_seng', $lhp->kerugian_seng);
-                        $templateProcessor->setValue('uraian_seng', $lhp->uraian_seng);
-                        $bulanIndonesia = [
-                            "01" => "Januari",
-                            "02" => "Februari",
-                            "03" => "Maret",
-                            "04" => "April",
-                            "05" => "Mei",
-                            "06" => "Juni",
-                            "07" => "Juli",
-                            "08" => "Agustus",
-                            "09" => "September",
-                            "10" => "Oktober",
-                            "11" => "November",
-                            "12" => "Desember"
-                        ];
-                        list($tahun, $bulan, $tanggal) = explode("-", $lhp->tanggal_lap_seng);
-                        $namaBulan = $bulanIndonesia[$bulan];
-                        $tanggalDalamBahasaIndonesia = "$tanggal $namaBulan $tahun";
-                        $templateProcessor->setValue('tanggal_lap_seng', $tanggalDalamBahasaIndonesia);
-                        $templateProcessor->setImageValue('ttd', 'storage/'.$lhp->user->ttd);
-                        //Proses Dokumentasi
-                        if (($lhp->dok1)) {
-                            $templateProcessor->setImageValue('dok1', 'storage/'.$lhp->dok1);
-                        } else {
-                            $templateProcessor->setValue('dok1', '');
-                        }
-                        if (($lhp->dok2)) {
-                            $templateProcessor->setImageValue('dok2', 'storage/'.$lhp->dok2);
-                        } else {
-                            $templateProcessor->setValue('dok2', '');
-                        }
-                        if (($lhp->dok3)) {
-                            $templateProcessor->setImageValue('dok3', 'storage/'.$lhp->dok3);
-                        } else {
-                            $templateProcessor->setValue('dok3', '');
-                        }
-                        if (($lhp->dok4)) {
-                            $templateProcessor->setImageValue('dok4', 'storage/'.$lhp->dok4);
-                        } else {
-                            $templateProcessor->setValue('dok4', '');
-                        }
+                        // // Penanggalan Indonesia
+                        //     $bulanIndonesia = [
+                        //         "01" => "Januari",
+                        //         "02" => "Februari",
+                        //         "03" => "Maret",
+                        //         "04" => "April",
+                        //         "05" => "Mei",
+                        //         "06" => "Juni",
+                        //         "07" => "Juli",
+                        //         "08" => "Agustus",
+                        //         "09" => "September",
+                        //         "10" => "Oktober",
+                        //         "11" => "November",
+                        //         "12" => "Desember"
+                        //         ];
+                        //         list($tahun, $bulan, $tanggal) = explode("-", $lhp->tanggal_lap_seng);
+                        //     $namaBulan = $bulanIndonesia[$bulan];
+                        //     $tanggalDalamBahasaIndonesia = "$tanggal $namaBulan $tahun";
+                        // // $section = PhpWord
+                        // // Prosessing INPUT
+                        //     $templateProcessor = new TemplateProcessor('word-template/lhp.docx');
+                        //     $templateProcessor->setValues([
+                        //         'noreg' => $lhp->nomor,
+                        //         'tahapan' => $lhp->tahapan->name,
+                        //         'namapkd' => $lhp->user->name,
+                        //         'jabatan' => 'PKD '. $lhp->user->kel->name,
+                        //         'nospt' => $lhp->spt->kode,
+                        //         'alamat' => $lhp->user->alamat,
+                        //         'bentuk' => $lhp->bentuk,
+                        //         'tujuan' => $lhp->tujuan,
+                        //         'sasaran' => $lhp->sasaran,
+                        //         'waktem' => $lhp->waktem,
+                        //         // 'uraian' => $lhp->uraian,
+                        //         // 'uraian' => $uraian,
+                        //         'peristiwa_pel' => $lhp->peristiwa_pel,
+                        //         'tem_kejadian_pel' => $lhp->tem_kejadian_pel,
+                        //         'wak_kejadian_pel' => $lhp->wak_kejadian_pel,
+                        //         'pelaku_pel' => $lhp->pelaku_pel,
+                        //         'alamat_pel' => $lhp->alamat_pel,
+                        //         'nama_saksi_1' => $lhp->nama_saksi_1,
+                        //         'alamat_saksi' => $lhp->alamat_saksi_1,
+                        //         'nama_saksi_2' => $lhp->nama_saksi_2,
+                        //         'alamat_saksi_2' => $lhp->alamat_saksi_2,
+                        //         'alat_bukti_1' => $lhp->alat_bukti_1,
+                        //         'alat_bukti_2' => $lhp->alat_bukti_2,
+                        //         'alat_bukti_3' => $lhp->alat_bukti_3,
+                        //         'bb_1' => $lhp->bb_1,
+                        //         'bb_2' => $lhp->bb_2,
+                        //         'bb_3' => $lhp->bb_3,
+                        //         'uraian_pel' => $lhp->uraian_pel,
+                        //         'fakta_pel' => $lhp->fakta_pel,
+                        //         'analisa_pel' => $lhp->analisa_pel,
+                        //         'peserta_pemilu_seng' => $lhp->peserta_pemilu_seng,
+                        //         'tempat_seng' => $lhp->tempat_seng,
+                        //         'waktu_kejadian_seng' => $lhp->waktu_kejadian_seng,
+                        //         'bentuk_seng' => $lhp->bentuk_seng,
+                        //         'identitas_seng' => $lhp->identitas_seng,
+                        //         'hari_seng' => $lhp->hari_seng,
+                        //         'kerugian_seng' => $lhp->kerugian_seng,
+                        //         'uraian_seng' => $lhp->uraian_seng,
+                        //         'tanggal_lap_seng' => $tanggalDalamBahasaIndonesia
+                        //         ]);
+                        //     $templateProcessor->setImageValue('ttd', 'storage/'.$lhp->user->ttd);
+                        // // Proses Dokumentasi
+                        //     if (($lhp->dok1)) {
+                        //         $templateProcessor->setImageValue('dok1', 'storage/'.$lhp->dok1);
+                        //     } else {
+                        //         $templateProcessor->setValue('dok1', '');
+                        //     }
+                        //     if (($lhp->dok2)) {
+                        //         $templateProcessor->setImageValue('dok2', 'storage/'.$lhp->dok2);
+                        //     } else {
+                        //         $templateProcessor->setValue('dok2', '');
+                        //     }
+                        //     if (($lhp->dok3)) {
+                        //         $templateProcessor->setImageValue('dok3', 'storage/'.$lhp->dok3);
+                        //     } else {
+                        //         $templateProcessor->setValue('dok3', '');
+                        //     }
+                        //     if (($lhp->dok4)) {
+                        //         $templateProcessor->setImageValue('dok4', 'storage/'.$lhp->dok4);
+                        //     } else {
+                        //         $templateProcessor->setValue('dok4', '');
+                        //     }
                         $fileName= str_replace("/", "-", $lhp->nomor);
-                        $templateProcessor->saveAs('DATA-FORM-A/'.$fileName . '.docx');
+                        // $templateProcessor->saveAs('DATA-FORM-A/'.$lhp->kel->name.'/'.$fileName . '.docx');
                         return response()
-                            ->download('DATA-FORM-A/'.$fileName . '.docx')
+                            ->download('DATA-FORM-A/'.$lhp->kel->name.'/'.$fileName . '.docx')
                             ->deleteFileAfterSend(false);
                     }),
                 // Save to Drive
+                Tables\Actions\Action::make('Save Drive')
+                    ->icon('heroicon-o-printer')
+                    ->action(function (Lhp $lhp, array $data) {
+                        $fileName= str_replace("/", "-", $lhp->nomor);
+                        Gdrive::put('DATA-FORM-A/'.$lhp->kel->name.'/'.$fileName . '.docx', public_path('DATA-FORM-A/'.$lhp->kel->name.'/'.$fileName . '.docx'));
+                    Notification::make()
+                    ->title('Data Berhasil Di Simpan di Google Drive')
+                    ->success()
+                    ->send();
+                    }),
                 ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

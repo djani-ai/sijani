@@ -21,7 +21,8 @@
         "livewire/livewire": "^3.3",
         "phpoffice/phpword": "^1.1",
         "psr/simple-cache": "3.0",
-        "pxlrbt/filament-excel": "^2.3"
+        "pxlrbt/filament-excel": "^2.3",
+        "yaza/laravel-google-drive-storage": "2.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
