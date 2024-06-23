@@ -59,7 +59,7 @@ class EditLhp extends EditRecord
                 'tujuan' => $lhp->tujuan,
                 'sasaran' => $lhp->sasaran,
                 'waktem' => $lhp->waktem,
-                // 'uraian' => $lhp->uraian,
+                'uraian' => $lhp->uraian,
                 // 'uraian' => $uraian,
                 'peristiwa_pel' => $lhp->peristiwa_pel,
                 'tem_kejadian_pel' => $lhp->tem_kejadian_pel,
@@ -90,6 +90,7 @@ class EditLhp extends EditRecord
                 'tanggal_lap_seng' => $tanggalDalamBahasaIndonesia
                 ]);
             $templateProcessor->setImageValue('ttd', 'storage/'.$lhp->user->ttd);
+            // $templateProcessor->setComplexValue('uraian' , $lhp->uraian);
         // Proses Dokumentasi
             if (($lhp->dok1)) {
                 $templateProcessor->setImageValue('dok1', 'storage/'.$lhp->dok1);
