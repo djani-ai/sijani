@@ -5,12 +5,10 @@ namespace App\Filament\Resources\LhpResource\Pages;
 use App\Filament\Resources\LhpResource;
 use App\Models\Lhp;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpWord\TemplateProcessor;
 use Yaza\LaravelGoogleDriveStorage\Gdrive;
-
 use function Livewire\after;
+use App\Filament\TemplateProcessor as TemplateProcessorHtml;;
 
 class CreateLhp extends CreateRecord
 {
@@ -23,6 +21,7 @@ class CreateLhp extends CreateRecord
 
     protected function afterCreate()
     {
+
         // Runs after the form fields are saved to the database.
         $lhp = $this->getRecord();
         // Penanggalan Indonesia
@@ -57,8 +56,7 @@ class CreateLhp extends CreateRecord
                 'tujuan' => $lhp->tujuan,
                 'sasaran' => $lhp->sasaran,
                 'waktem' => $lhp->waktem,
-                // 'uraian' => $lhp->uraian,
-                // 'uraian' => $uraian,
+                'uraian' => $lhp->uraian,
                 'peristiwa_pel' => $lhp->peristiwa_pel,
                 'tem_kejadian_pel' => $lhp->tem_kejadian_pel,
                 'wak_kejadian_pel' => $lhp->wak_kejadian_pel,
@@ -88,6 +86,7 @@ class CreateLhp extends CreateRecord
                 'tanggal_lap_seng' => $tanggalDalamBahasaIndonesia
                 ]);
             $templateProcessor->setImageValue('ttd', 'storage/'.$lhp->user->ttd);
+            // $templateProcessor->setHtmlBlockValue('uraian', ($lhp->uraian));
         // Proses Dokumentasi
             if (($lhp->dok1)) {
                 $templateProcessor->setImageValue('dok1', 'storage/'.$lhp->dok1);
@@ -111,7 +110,9 @@ class CreateLhp extends CreateRecord
             }
         $fileName= str_replace("/", "-", $lhp->nomor);
         $templateProcessor->saveAs('DATA-FORM-A/'.$lhp->kel->name.'/'.$fileName . '.docx');
-        Gdrive::put('DATA-FORM-A/'.$lhp->kel->name.'/'.$fileName . '.docx', public_path('DATA-FORM-A/'.$lhp->kel->name.'/'.$fileName . '.docx'));
+        // Gdrive::put('DATA-FORM-A/'.$lhp->kel->name.'/'.$fileName . '.docx', public_path('DATA-FORM-A/'.$lhp->kel->name.'/'.$fileName . '.docx'));
     }
 
 }
+
+
