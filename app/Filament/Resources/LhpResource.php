@@ -381,7 +381,7 @@ class LhpResource extends Resource
                     ->icon('heroicon-o-printer')
                     ->action(function (Lhp $lhp, array $data) {
                         $fileName= str_replace("/", "-", $lhp->nomor);
-                        Gdrive::put('DATA-FORM-A/'.$lhp->kel->name.'/'.$fileName . '.docx', public_path('DATA-FORM-A/'.$lhp->kel->name.'/'.$fileName . '.docx'));
+                    Gdrive::put('DATA-FORM-A/'.$lhp->kel->name.'/'.$fileName . '.docx', public_path('DATA-FORM-A/'.$lhp->kel->name.'/'.$fileName . '.docx'));
                     Notification::make()
                     ->title('Data Berhasil Di Simpan di Google Drive')
                     ->success()
